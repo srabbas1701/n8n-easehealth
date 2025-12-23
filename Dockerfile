@@ -9,12 +9,15 @@ RUN npm install -g pdf-parse
 RUN mkdir -p /usr/local/lib/node_modules/n8n/node_modules && \
     ln -s /usr/local/lib/node_modules/pdf-parse /usr/local/lib/node_modules/n8n/node_modules/pdf-parse
 
+# Install gosu for proper user switching
+RUN apk add --no-cache gosu
+
 # Create entrypoint script that fixes permissions at runtime
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
     echo 'mkdir -p /home/node/.n8n' >> /docker-entrypoint.sh && \
     echo 'chown -R node:node /home/node/.n8n' >> /docker-entrypoint.sh && \
     echo 'chmod -R 755 /home/node/.n8n' >> /docker-entrypoint.sh && \
-    echo 'exec su-exec node n8n start' >> /docker-entrypoint.sh && \
+    echo 'exec gosu node n8n start' >> /docker-entrypoint.sh && \
     chmod +x /docker-entrypoint.sh
 
 # Environment variables
@@ -31,5 +34,4 @@ ENV NODE_PATH=/usr/local/lib/node_modules
 
 EXPOSE 5678
 
-# Run as root initially, entrypoint will switch to node user
 ENTRYPOINT ["/docker-entrypoint.sh"]
