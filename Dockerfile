@@ -1,16 +1,19 @@
 FROM n8nio/n8n:latest
 
-# Stay as root just for installation
 USER root
 
-# Install pdf-parse globally
+# Install pdf-parse directly into n8n's node_modules (not globally)
+# This ensures it's accessible from n8n Code nodes
+WORKDIR /usr/local/lib/node_modules/n8n
+RUN npm install pdf-parse --save
+
+# Also install globally as backup
 RUN npm install -g pdf-parse
 
-# Create symlink inside n8n node_modules to global pdf-parse
-RUN mkdir -p /usr/local/lib/node_modules/n8n/node_modules && \
-    ln -s /usr/local/lib/node_modules/pdf-parse /usr/local/lib/node_modules/n8n/node_modules/pdf-parse
+# Reset working directory
+WORKDIR /home/node
 
-# Switch back to node user (as original image expects)
+# Switch back to node user
 USER node
 
 # Environment variables
@@ -20,8 +23,7 @@ ENV N8N_PROTOCOL=https
 ENV GENERIC_TIMEZONE=Asia/Kolkata
 
 # CRITICAL: Allow external modules in n8n Code nodes
-ENV NODE_FUNCTION_ALLOW_EXTERNAL=pdf-parse,pdf-lib,axios
+ENV NODE_FUNCTION_ALLOW_EXTERNAL=pdf-parse,pdf-lib,axios,buffer
 ENV NODE_FUNCTION_ALLOW_BUILTIN=*
-ENV NODE_PATH=/usr/local/lib/node_modules
 
 EXPOSE 5678
