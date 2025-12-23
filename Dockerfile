@@ -9,12 +9,13 @@ RUN npm install -g pdf-parse
 RUN mkdir -p /usr/local/lib/node_modules/n8n/node_modules && \
     ln -s /usr/local/lib/node_modules/pdf-parse /usr/local/lib/node_modules/n8n/node_modules/pdf-parse
 
-# Create .n8n directory with correct permissions for the node user
-RUN mkdir -p /home/node/.n8n && \
-    chown -R node:node /home/node/.n8n && \
-    chmod -R 755 /home/node/.n8n
-
-USER node
+# Create entrypoint script that fixes permissions at runtime
+RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
+    echo 'mkdir -p /home/node/.n8n' >> /docker-entrypoint.sh && \
+    echo 'chown -R node:node /home/node/.n8n' >> /docker-entrypoint.sh && \
+    echo 'chmod -R 755 /home/node/.n8n' >> /docker-entrypoint.sh && \
+    echo 'exec su-exec node n8n start' >> /docker-entrypoint.sh && \
+    chmod +x /docker-entrypoint.sh
 
 # Environment variables
 ENV N8N_HOST=0.0.0.0
@@ -29,3 +30,6 @@ ENV NODE_FUNCTION_ALLOW_BUILTIN=*
 ENV NODE_PATH=/usr/local/lib/node_modules
 
 EXPOSE 5678
+
+# Run as root initially, entrypoint will switch to node user
+ENTRYPOINT ["/docker-entrypoint.sh"]
