@@ -1,8 +1,3 @@
-# Navigate to your n8n directory
-cd C:\n8n
-
-# Update the Dockerfile with the correct content
-@"
 FROM n8nio/n8n:latest
 
 USER root
@@ -22,7 +17,9 @@ ENV N8N_PORT=5678
 ENV N8N_PROTOCOL=https
 ENV GENERIC_TIMEZONE=Asia/Kolkata
 
-EXPOSE 5678
-"@ | Out-File -FilePath Dockerfile -Encoding utf8
+# CRITICAL: Allow external modules in n8n Code nodes
+ENV NODE_FUNCTION_ALLOW_EXTERNAL=pdf-parse,pdf-lib,axios
+ENV NODE_FUNCTION_ALLOW_BUILTIN=*
+ENV NODE_PATH=/usr/local/lib/node_modules
 
-Write-Host "✅ Dockerfile updated with pdf-parse installation"
+EXPOSE 5678
