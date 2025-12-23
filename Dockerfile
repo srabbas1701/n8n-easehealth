@@ -2,16 +2,19 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# Install pdf-parse directly into n8n's node_modules (not globally)
-# This ensures it's accessible from n8n Code nodes
-WORKDIR /usr/local/lib/node_modules/n8n
-RUN npm install pdf-parse --save
+# Install pdf-parse in a way that works with n8n's module resolution
+RUN cd /usr/local/lib/node_modules/n8n && \
+    npm install --save pdf-parse || true
 
-# Also install globally as backup
-RUN npm install -g pdf-parse
+# Create node_modules in n8n if it doesn't exist and install there too
+RUN mkdir -p /usr/local/lib/node_modules/n8n/node_modules && \
+    cd /usr/local/lib/node_modules/n8n/node_modules && \
+    npm init -y 2>/dev/null || true && \
+    npm install pdf-parse 2>/dev/null || true
 
-# Reset working directory
-WORKDIR /home/node
+# Fallback: Install globally and create symlink
+RUN npm install -g pdf-parse && \
+    ln -sf /usr/local/lib/node_modules/pdf-parse /usr/local/lib/node_modules/n8n/node_modules/pdf-parse 2>/dev/null || true
 
 # Switch back to node user
 USER node
