@@ -9,16 +9,10 @@ RUN npm install -g pdf-parse
 RUN mkdir -p /usr/local/lib/node_modules/n8n/node_modules && \
     ln -s /usr/local/lib/node_modules/pdf-parse /usr/local/lib/node_modules/n8n/node_modules/pdf-parse
 
-# Install gosu for proper user switching
-RUN apk add --no-cache gosu
-
-# Create entrypoint script that fixes permissions at runtime
-RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
-    echo 'mkdir -p /home/node/.n8n' >> /docker-entrypoint.sh && \
-    echo 'chown -R node:node /home/node/.n8n' >> /docker-entrypoint.sh && \
-    echo 'chmod -R 755 /home/node/.n8n' >> /docker-entrypoint.sh && \
-    echo 'exec gosu node n8n start' >> /docker-entrypoint.sh && \
-    chmod +x /docker-entrypoint.sh
+# Create .n8n directory
+RUN mkdir -p /home/node/.n8n && \
+    chown -R node:node /home/node/.n8n && \
+    chmod -R 777 /home/node/.n8n
 
 # Environment variables
 ENV N8N_HOST=0.0.0.0
@@ -34,4 +28,5 @@ ENV NODE_PATH=/usr/local/lib/node_modules
 
 EXPOSE 5678
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+# Run as root to avoid volume permission issues
+CMD ["n8n", "start"]
