@@ -3,6 +3,7 @@ FROM n8nio/n8n:latest
 USER root
 
 # Install Debian-compatible libraries for PDF/image rendering
+
 RUN apt-get update && \
     apt-get install -y \
     ca-certificates \
