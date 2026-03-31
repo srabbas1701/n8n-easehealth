@@ -1,13 +1,12 @@
-# 🔒 Security: Ignore secrets & configs
-.env
-.env.*        # Covers .env.production, .env.development, etc.
-.n8n          # Skip local cache, sessions, credentials
-database.sqlite
-*.log
-
-# 📦 Skip unnecessary size and dev files
-node_modules/
-.git/
+# Ignore local config, logs, and runtime files
+node_modules
+.git
+.env*
 .DS_Store
-npm-debug.log
-yarn-error.log
+*.log
+.n8n
+database.sqlite
+
+# Prevent accidental bundling of local workflows or binary data
+storage
+binaryData
