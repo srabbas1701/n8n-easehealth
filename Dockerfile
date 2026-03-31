@@ -1,20 +1,4 @@
-FROM n8nio/n8n:latest
-
-USER root
-
-# Install dependencies using Debian-compatible commands
-RUN apt-get update && \
-    apt-get install -y \
-        chromium \
-        libnss3 \
-        libatk-bridge2.0-0 \
-        libxss1 \
-        libasound2 \
-        libgtk-3-0 \
-        fonts-freefont-ttf \
-        --no-install-recommends && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+FROM n8nio/n8n:full
 
 USER node
 
