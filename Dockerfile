@@ -1,38 +1,26 @@
-FROM node:20-bookworm
+# Use Playwright image (includes all browser deps)
+FROM mcr.microsoft.com/playwright:v1.44.0-jammy
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-  chromium \
-  fonts-liberation \
-  libatk-bridge2.0-0 \
-  libatk1.0-0 \
-  libcups2 \
-  libdbus-1-3 \
-  libgdk-pixbuf2.0-0 \
-  libnspr4 \
-  libnss3 \
-  libxcomposite1 \
-  libxdamage1 \
-  libxrandr2 \
-  xdg-utils \
-  wget \
-  unzip \
-  curl \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+# Switch to root to install packages
+USER root
 
-# Install n8n
-RUN npm install --location=global n8n
+# Install Node.js 20
+RUN apt-get update && apt-get install -y curl \
+  && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+  && apt-get install -y nodejs
 
-# Create n8n user
-RUN useradd -m -s /bin/bash node
-USER node
+# Verify versions
+RUN node -v && npm -v
 
-ENV N8N_HOST=0.0.0.0
-ENV N8N_PORT=5678
-ENV N8N_PROTOCOL=http
-ENV GENERIC_TIMEZONE=Asia/Kolkata
+# Install n8n globally
+RUN npm install -g n8n
 
+# Create n8n directory
+RUN mkdir /data
+WORKDIR /data
+
+# Expose Railway port
 EXPOSE 5678
 
+# Start n8n
 CMD ["n8n"]
