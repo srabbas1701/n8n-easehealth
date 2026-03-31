@@ -2,18 +2,19 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# Install necessary Alpine packages
-RUN apk update && \
-    apk add --no-cache \
-    libc6-compat \
-    libstdc++ \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    && rm -rf /var/cache/apk/*
+# Install dependencies using Debian-compatible commands
+RUN apt-get update && \
+    apt-get install -y \
+        chromium \
+        libnss3 \
+        libatk-bridge2.0-0 \
+        libxss1 \
+        libasound2 \
+        libgtk-3-0 \
+        fonts-freefont-ttf \
+        --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 USER node
 
