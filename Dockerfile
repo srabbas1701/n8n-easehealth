@@ -1,31 +1,25 @@
-
 FROM n8nio/n8n:latest
 
 USER root
 
-# 🛠 Install system libraries required by pdfjs-dist for Extract From PDF
-RUN apt-get update && apt-get install -y \
-    libnss3 \
-    libxss1 \
+# ✅ Install Alpine-compatible packages needed by Extract PDF node
+RUN apk add --no-cache \
+    nss \
+    xss \
     libx11-dev \
-    libxkbfile-dev \
-    libsecret-1-dev \
-    libgtk-3-0 \
-    libasound2 \
-    libxshmfence-dev \
-    libcairo2 \
-    libjpeg-dev \
-    libpango1.0-0 \
-    libgif-dev \
-    build-essential \
+    xkeyboard-config \
+    libsecret \
+    gtk+3.0 \
+    alsa-lib \
+    libxshmfence \
+    cairo \
+    jpeg-dev \
+    pango \
+    giflib \
+    build-base \
     g++ \
-    python3 \
- && apt-get clean
+    python3
 
-# Optional: remove deprecated RUNNERS env variable if still in use
-ENV N8N_RUNNERS_ENABLED=
-
-# Switch back to node user
 USER node
 
 # 🌐 Core Environment Variables
