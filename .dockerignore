@@ -1,12 +1,7 @@
-# Ignore local config, logs, and runtime files
 node_modules
 .git
 .env*
-.DS_Store
-*.log
 .n8n
+*.log
 database.sqlite
-
-# Prevent accidental bundling of local workflows or binary data
-storage
-binaryData
+.DS_Store
